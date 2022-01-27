@@ -11,13 +11,13 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 # load the model and the trained weights
 model = create_model(num_classes=6).to(device)
 model.load_state_dict(torch.load(
-    './outputs/model20.pth', map_location=device
+    '../outputs/model20.pth', map_location=device
 ))
 model.eval()
 
 # directory where all the images are present
-DIR_TEST = './'
-test_images = glob.glob(f"{DIR_TEST}/*.jpg")[:-1]
+DIR_TEST = '../test_data'
+test_images = glob.glob(f"{DIR_TEST}/*.png")[:-1]
 test_images = [x for x in test_images if 'predicted' not in x]
 print(test_images)
 print(f"Test instances: {len(test_images)}")
@@ -78,7 +78,7 @@ for i in range(len(test_images)):
         plt.imshow(orig_image)
         plt.title('Prediction')
         plt.show()
-        cv2.imwrite(f"./predicted_{i+1}.jpg", orig_image)
+        cv2.imwrite(f"../test_predictions/predicted_{i+1}.jpg", orig_image)
     print(f"Image {i+1} done...")
     print('-'*50)
 
