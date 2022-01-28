@@ -3,7 +3,7 @@
 This repository contains code for Road Damage and Pothole Detection using Faster RCNN in Pytorch.
 
 * Train a cusom object detection model using the pre-trained PyTorch Faster R-CNN model with a ResNet-50-FPN backbone.
-* The dataset that is used is the (https://www.kaggle.com/trolololo888/potholes-and-road-damage-with-annotations)[Road Damage and Pothole Detection] dataset from Kaggle.
+* The dataset that is used is the [Road Damage and Pothole Detection](https://www.kaggle.com/trolololo888/potholes-and-road-damage-with-annotations) dataset from Kaggle.
 * The dataset consisted of 500 images and corresponding annotation files in PascalVOC format. A split of 80:20 was used for training and validation data .
 * For data augmentations , Albumentation library was used to introduce RandomRotate , MotionBlur , Flips and MedianBlur . 
 * Created a simple yet very effective pipeline to fine-tune the PyTorch Faster RCNN model.
