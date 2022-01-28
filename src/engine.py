@@ -5,6 +5,8 @@ from model import create_model
 from utils import Averager
 from tqdm.auto import tqdm
 from datasets import train_loader, valid_loader
+from utils import get_batch_mAP
+import numpy as np
 
 import torch
 import matplotlib.pyplot as plt
@@ -154,3 +156,29 @@ if __name__ == '__main__':
         plt.close('all')
         # sleep for 5 seconds after each epoch
         time.sleep(5)
+
+    # initialize tqdm progress bar
+    prog_bar = tqdm(valid_loader, total=len(valid_loader))
+
+    # calculating VOC PASCAL mAP and COCO mAP for the validation data.
+    voc_map = []
+    voc_all_map = []
+    c_map = []
+    for i, data in enumerate(prog_bar):
+        images, targets = data
+
+        images = list(image.to(DEVICE) for image in images)
+        targets = [{k: v.to(DEVICE) for k, v in t.items()} for t in targets]
+
+        with torch.no_grad():
+    #             print(targets)
+            outputs = model(images)
+        
+    #     print('Batch : ',i)
+        a,b,c = get_batch_mAP(outputs,targets)
+        voc_map.append(a)
+        voc_all_map.append(b)
+        c_map.append(c)
+    print(f"VOC PASCAL mAP : {np.mean(voc_map)}")
+    print(f"VOC PASCAL mAP in all points : {np.mean(voc_all_map)}")
+    print(f"COCO mAP: {np.mean(c_map)}")

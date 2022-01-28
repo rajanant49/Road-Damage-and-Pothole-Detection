@@ -4,6 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from config import DEVICE
 from albumentations.pytorch import ToTensorV2
+import numpy as np
+from config import NUM_CLASSES
+from mean_average_precision import MetricBuilder
 
 # this class keeps track of the training and validation loss values...
 # ... and helps to get the average for each epoch as well
@@ -80,3 +83,43 @@ def show_tranformed_image(train_loader):
             plt.imshow(sample)
             plt.title('Transformed Image')
             plt.show()
+
+
+def get_batch_mAP(outputs,targets):
+    # print list of available metrics
+#     print(MetricBuilder.get_metrics_list())
+    # create metric_fn
+    metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=NUM_CLASSES)
+    # add some samples to evaluation
+    
+    for b in range(len(outputs)):
+        preds = []
+        for i in range(len(outputs[b]['boxes'])):
+            bboxes = outputs[b]['boxes'][i].tolist()
+            label = outputs[b]['labels'][i].tolist()
+            score = outputs[b]['scores'][i].tolist()
+            pred = bboxes + [label,score]
+            preds.append(pred)
+        preds = np.array(preds)
+        
+        gts = []
+        for i in range(len(targets[b]['boxes'])):
+            bboxes = targets[b]['boxes'][i].tolist()
+            label = targets[b]['labels'][i].tolist()
+            crowd = targets[b]['iscrowd'][i].tolist()
+            gt = bboxes + [label,0,crowd]
+            gts.append(gt)
+        gts = np.array(gts)
+        
+        metric_fn.add(preds, gts)
+    # compute PASCAL VOC metric
+#     print(f"VOC PASCAL mAP: {metric_fn.value(iou_thresholds=0.5, recall_thresholds=np.arange(0., 1.1, 0.1))['mAP']}")
+    voc_pascal_map = metric_fn.value(iou_thresholds=0.5, recall_thresholds=np.arange(0., 1.1, 0.1))['mAP']
+    # compute PASCAL VOC metric at the all points
+#     print(f"VOC PASCAL mAP in all points: {metric_fn.value(iou_thresholds=0.5)['mAP']}")
+    voc_pascal_map_allpts = metric_fn.value(iou_thresholds=0.5)['mAP']
+
+    # compute metric COCO metric
+#     print(f"COCO mAP: {metric_fn.value(iou_thresholds=np.arange(0.5, 1.0, 0.05), recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy='soft')['mAP']}")
+    coco_map = metric_fn.value(iou_thresholds=np.arange(0.5, 1.0, 0.05), recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy='soft')['mAP']
+    return voc_pascal_map,voc_pascal_map_allpts,coco_map
