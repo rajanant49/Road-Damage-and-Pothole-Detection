@@ -8,7 +8,7 @@ This repository contains code for Road Damage and Pothole Detection using Faster
 * For data augmentations , Albumentation library was used to introduce RandomRotate , MotionBlur , Flips and MedianBlur . 
 * Created a simple yet very effective pipeline to fine-tune the PyTorch Faster RCNN model.
 * After the training completes, carried out inference using new images from the internet that the model has not seen during training or validation.
-* The model achieved a VOC PASCAL mAP of 0.4066.
+* The model achieved a VOC PASCAL mAP of 0.4286.
 * Inferenced Images can be seen in the test_predictions folder.
 
 * The model is also deployed through streamlit where one can upload image of roads and observed various deformities detected by the model.
